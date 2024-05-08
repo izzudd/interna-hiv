@@ -1,4 +1,6 @@
 import pandas as pd
+import numpy as np
+import deepchem as dc
 
 def load_main_data():
   main_df = pd.read_csv('datasets/HIV.csv', encoding='unicode_escape')
@@ -20,4 +22,10 @@ def load_main_data():
   main_df = main_df.drop_duplicates()
   return main_df
   
+def scaffold_split(dataset):
+  Xs = dataset['smiles'].values
+  Ys = dataset['HIV_active'].values
   
+  dataset = dc.data.NumpyDataset (X=Xs, y=Ys, ids=Xs)
+  scaffoldsplitter = dc.splits.ScaffoldSplitter()
+  return scaffoldsplitter.train_test_split(dataset)
