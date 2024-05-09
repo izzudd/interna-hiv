@@ -25,7 +25,13 @@ def load_main_data():
 def scaffold_split(dataset):
   Xs = dataset['smiles'].values
   Ys = dataset['HIV_active'].values
+  W = np.ones(Ys.shape)
   
-  dataset = dc.data.NumpyDataset (X=Xs, y=Ys, ids=Xs)
+  positive_count = sum(Ys)
+  negative_count = sum(Ys == False)
+  for i, y in enumerate(Ys):
+    W[i] = negative_count/positive_count if y else 1
+  
+  dataset = dc.data.NumpyDataset (X=Xs, y=Ys, w=W, ids=Xs)
   scaffoldsplitter = dc.splits.ScaffoldSplitter()
   return scaffoldsplitter.train_test_split(dataset)
