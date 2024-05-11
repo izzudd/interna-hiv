@@ -22,9 +22,10 @@ def load_main_data():
   main_df = main_df.drop_duplicates()
   return main_df
   
-def scaffold_split(dataset):
-  Xs = dataset['smiles'].values
-  Ys = dataset['HIV_active'].values
+def scaffold_split(dataset, seed=326, x_col='smiles', y_col='HIV_active', id_col='smiles'):
+  Xs = dataset[x_col].values
+  Ys = dataset[y_col].values
+  ids = dataset[id_col].values
   W = np.ones(Ys.shape)
   
   positive_count = sum(Ys)
@@ -32,6 +33,6 @@ def scaffold_split(dataset):
   for i, y in enumerate(Ys):
     W[i] = negative_count/positive_count if y else 1
   
-  dataset = dc.data.NumpyDataset (X=Xs, y=Ys, w=W, ids=Xs)
+  dataset = dc.data.NumpyDataset (X=Xs, y=Ys, w=W, ids=ids)
   scaffoldsplitter = dc.splits.ScaffoldSplitter()
-  return scaffoldsplitter.train_test_split(dataset)
+  return scaffoldsplitter.train_valid_test_split(dataset, seed=seed, frac_train=.7, frac_valid=.2, frac_test=.1)
